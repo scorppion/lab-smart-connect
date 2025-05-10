@@ -191,7 +191,12 @@ const Connect = () => {
                 <p className="text-sm text-muted-foreground text-center mb-4">
                   Conecte um novo número ao Smart Bot
                 </p>
-                <Button onClick={() => document.querySelector('[value="new"]')?.click()}>
+                <Button onClick={() => {
+                  const newTabTrigger = document.querySelector('[value="new"]');
+                  if (newTabTrigger && 'click' in newTabTrigger) {
+                    (newTabTrigger as HTMLElement).click();
+                  }
+                }}>
                   Nova Conexão
                 </Button>
               </CardContent>
