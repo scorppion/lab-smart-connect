@@ -1,100 +1,45 @@
 
-import React, { useState } from "react";
-import { format, startOfWeek, addDays, isToday } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { Calendar as CalendarIcon, Plus, User } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import React from "react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useIsMobile } from "@/hooks/use-mobile";
-
-// Dados de exemplo
-const professionals = [
-  { id: 1, name: "Dr. Carlos Silva", specialty: "Cabelo" },
-  { id: 2, name: "Dra. Ana Souza", specialty: "Pele" },
-  { id: 3, name: "Dr. Roberto Martins", specialty: "Massagem" },
-];
-
-const appointments = [
-  { id: 1, clientName: "João Pedro", service: "Corte de Cabelo", professionalId: 1, date: new Date(2025, 4, 10, 10, 0), duration: 30 },
-  { id: 2, clientName: "Maria Silva", service: "Limpeza de Pele", professionalId: 2, date: new Date(2025, 4, 10, 11, 0), duration: 60 },
-  { id: 3, clientName: "Ricardo Almeida", service: "Massagem", professionalId: 3, date: new Date(2025, 4, 10, 14, 0), duration: 50 },
-  { id: 4, clientName: "Paula Costa", service: "Corte de Cabelo", professionalId: 1, date: new Date(2025, 4, 11, 9, 30), duration: 30 },
-];
-
-const timeSlots = [];
-for (let i = 8; i < 19; i++) {
-  timeSlots.push({ hour: i, minute: 0 });
-  timeSlots.push({ hour: i, minute: 30 });
-}
+import { useAgenda } from "@/hooks/useAgenda";
+import { AgendaHeader } from "@/components/agenda/AgendaHeader";
+import { DateSelector } from "@/components/agenda/DateSelector";
+import { ProfessionalSelector } from "@/components/agenda/ProfessionalSelector";
+import { AgendaViewSelector } from "@/components/agenda/AgendaViewSelector";
+import { DayView } from "@/components/agenda/DayView";
+import { WeekView } from "@/components/agenda/WeekView";
 
 const Agenda = () => {
-  const [date, setDate] = useState<Date | undefined>(new Date());
-  const [selectedProfessional, setSelectedProfessional] = useState<string>("1");
   const isMobile = useIsMobile();
-
-  // Gerar dias da semana a partir do dia atual
-  const startOfCurrentWeek = startOfWeek(new Date(), { weekStartsOn: 0 });
-  const weekDays = Array.from({ length: 7 }, (_, i) => addDays(startOfCurrentWeek, i));
+  const {
+    date,
+    setDate,
+    selectedProfessional,
+    setSelectedProfessional,
+    professionals,
+    appointments,
+    timeSlots,
+    weekDays,
+    handleNewAppointment,
+  } = useAgenda();
 
   return (
     <div className="space-y-6 animate-fadeIn">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-        <h1 className="text-2xl font-bold tracking-tight">Agenda</h1>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" /> Novo Agendamento
-        </Button>
-      </div>
+      <AgendaHeader onNewAppointment={handleNewAppointment} />
 
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Sidebar - renderizado como um bloco superior em mobile */}
         <div className="w-full lg:w-64 space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium">Calendário</CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  className="w-full pointer-events-auto"
-                />
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium">Profissionais</CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0 space-y-3">
-                {professionals.map((professional) => (
-                  <div
-                    key={professional.id}
-                    className={cn(
-                      "flex items-center gap-3 px-3 py-2 rounded-md text-sm cursor-pointer",
-                      selectedProfessional === professional.id.toString()
-                        ? "bg-primary/10 text-primary font-medium"
-                        : "hover:bg-secondary"
-                    )}
-                    onClick={() => setSelectedProfessional(professional.id.toString())}
-                  >
-                    <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                      <User size={16} className="text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-medium">{professional.name}</p>
-                      <p className="text-xs text-muted-foreground">{professional.specialty}</p>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
+            <DateSelector date={date} setDate={setDate} isCardView={true} />
+            <ProfessionalSelector 
+              professionals={professionals}
+              selectedProfessional={selectedProfessional}
+              setSelectedProfessional={setSelectedProfessional}
+              isCardView={true}
+            />
           </div>
         </div>
 
@@ -104,161 +49,35 @@ const Agenda = () => {
             <CardHeader>
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className="w-full sm:w-auto justify-start">
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {date ? format(date, "PPP", { locale: ptBR }) : <span>Selecione uma data</span>}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={date}
-                        onSelect={setDate}
-                        initialFocus
-                        className="pointer-events-auto"
-                      />
-                    </PopoverContent>
-                  </Popover>
-
-                  <div className="w-full sm:w-[180px]">
-                    <Select value={selectedProfessional} onValueChange={setSelectedProfessional}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecione um profissional" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {professionals.map((professional) => (
-                          <SelectItem key={professional.id} value={professional.id.toString()}>
-                            {professional.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <DateSelector date={date} setDate={setDate} />
+                  <ProfessionalSelector 
+                    professionals={professionals}
+                    selectedProfessional={selectedProfessional}
+                    setSelectedProfessional={setSelectedProfessional}
+                  />
                 </div>
 
-                <Tabs defaultValue="day" className="w-full sm:w-auto">
-                  <TabsList className="w-full sm:w-auto grid grid-cols-2">
-                    <TabsTrigger value="day">Dia</TabsTrigger>
-                    <TabsTrigger value="week">Semana</TabsTrigger>
-                  </TabsList>
-                </Tabs>
+                <AgendaViewSelector defaultValue="day" className="w-full sm:w-auto" />
               </div>
             </CardHeader>
 
             <CardContent className="p-0 sm:p-6">
               <Tabs defaultValue="day" className="w-full">
                 <TabsContent value="day" className="mt-0 overflow-x-auto">
-                  <div className="relative min-h-[600px] mt-4 w-full min-w-[500px]">
-                    {timeSlots.map((slot, index) => {
-                      const timeLabel = `${slot.hour.toString().padStart(2, '0')}:${slot.minute.toString().padStart(2, '0')}`;
-                      
-                      // Filtrar agendamentos para este horário e profissional
-                      const slotAppointments = appointments.filter((apt) => {
-                        if (apt.professionalId.toString() !== selectedProfessional) return false;
-                        
-                        const aptHour = apt.date.getHours();
-                        const aptMinute = apt.date.getMinutes();
-                        return aptHour === slot.hour && aptMinute === slot.minute;
-                      });
-                      
-                      return (
-                        <div key={index} className="flex">
-                          <div className="w-14 py-2 text-xs text-muted-foreground text-right pr-2">
-                            {timeLabel}
-                          </div>
-                          <div className="flex-1 border-t border-border relative">
-                            {slotAppointments.map((appointment) => (
-                              <div
-                                key={appointment.id}
-                                className={`absolute left-0 right-0 ml-1 mr-1 rounded-md px-2 py-1 text-sm bg-primary/10 border-l-4 border-primary cursor-pointer`}
-                                style={{
-                                  top: "0",
-                                  height: `${appointment.duration}px`,
-                                }}
-                              >
-                                <p className="font-medium truncate">{appointment.clientName}</p>
-                                <p className="text-xs text-muted-foreground truncate">
-                                  {appointment.service}
-                                </p>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+                  <DayView 
+                    selectedProfessional={selectedProfessional}
+                    timeSlots={timeSlots}
+                    appointments={appointments}
+                  />
                 </TabsContent>
 
                 <TabsContent value="week" className="mt-0 overflow-x-auto">
-                  <div className="grid grid-cols-8 gap-1 mt-4 min-w-[800px]">
-                    <div className="h-10"></div>
-                    {weekDays.map((day, i) => (
-                      <div
-                        key={i}
-                        className={cn(
-                          "h-10 flex flex-col items-center justify-center rounded-md",
-                          isToday(day) && "bg-primary/10 text-primary font-medium"
-                        )}
-                      >
-                        <div className="text-xs font-medium">
-                          {format(day, "EEE", { locale: ptBR })}
-                        </div>
-                        <div className={cn("text-sm", isToday(day) && "font-medium")}>
-                          {format(day, "d")}
-                        </div>
-                      </div>
-                    ))}
-
-                    {timeSlots.map((slot, slotIndex) => (
-                      <React.Fragment key={slotIndex}>
-                        <div className="border-t border-border text-xs text-muted-foreground p-2 text-right">
-                          {`${slot.hour.toString().padStart(2, '0')}:${slot.minute.toString().padStart(2, '0')}`}
-                        </div>
-                        
-                        {weekDays.map((day, dayIndex) => {
-                          const cellAppointments = appointments.filter((apt) => {
-                            if (apt.professionalId.toString() !== selectedProfessional) return false;
-                            
-                            const aptDay = apt.date.getDate();
-                            const aptMonth = apt.date.getMonth();
-                            const aptYear = apt.date.getFullYear();
-                            const aptHour = apt.date.getHours();
-                            const aptMinute = apt.date.getMinutes();
-                            
-                            const cellDay = day.getDate();
-                            const cellMonth = day.getMonth();
-                            const cellYear = day.getFullYear();
-                            
-                            return (
-                              aptDay === cellDay &&
-                              aptMonth === cellMonth &&
-                              aptYear === cellYear &&
-                              aptHour === slot.hour &&
-                              aptMinute === slot.minute
-                            );
-                          });
-
-                          return (
-                            <div
-                              key={dayIndex}
-                              className="border-t border-border h-10 relative"
-                            >
-                              {cellAppointments.map((appointment) => (
-                                <div
-                                  key={appointment.id}
-                                  className="absolute inset-0.5 bg-primary/10 rounded text-xs p-1 truncate border-l-2 border-primary"
-                                >
-                                  {appointment.clientName} - {appointment.service}
-                                </div>
-                              ))}
-                            </div>
-                          );
-                        })}
-                      </React.Fragment>
-                    ))}
-                  </div>
+                  <WeekView 
+                    weekDays={weekDays}
+                    timeSlots={timeSlots}
+                    appointments={appointments}
+                    selectedProfessional={selectedProfessional}
+                  />
                 </TabsContent>
               </Tabs>
             </CardContent>
