@@ -32,23 +32,23 @@ export const ProfessionalSelector = ({
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium">Profissionais</CardTitle>
         </CardHeader>
-        <CardContent className="pt-0 space-y-3 max-h-[300px] overflow-y-auto">
+        <CardContent className="pt-0 space-y-2 max-h-[260px] overflow-y-auto">
           {professionals.map((professional) => (
             <div
               key={professional.id}
               className={cn(
-                "flex items-center gap-3 px-3 py-2 rounded-md text-sm cursor-pointer",
+                "flex items-center gap-2 px-2 py-1.5 rounded-md text-sm cursor-pointer",
                 selectedProfessional === professional.id.toString()
                   ? "bg-primary/10 text-primary font-medium"
                   : "hover:bg-secondary"
               )}
               onClick={() => setSelectedProfessional(professional.id.toString())}
             >
-              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <User size={16} className="text-primary" />
+              <div className="h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <User size={14} className="text-primary" />
               </div>
               <div>
-                <p className="font-medium">{professional.name}</p>
+                <p className="font-medium text-xs leading-tight">{professional.name}</p>
                 <p className="text-xs text-muted-foreground">{professional.specialty}</p>
               </div>
             </div>

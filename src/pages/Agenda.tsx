@@ -40,7 +40,7 @@ const Agenda = () => {
 
       <div className="flex flex-col lg:flex-row gap-4">
         {/* Sidebar - Hidden on mobile, visible on desktop */}
-        <div className="hidden lg:block w-64 max-w-[280px] space-y-4 flex-shrink-0">
+        <div className="hidden lg:block w-56 max-w-[260px] space-y-4 flex-shrink-0">
           <DateSelector 
             date={date} 
             setDate={setDate} 

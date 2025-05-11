@@ -1,9 +1,7 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { 
-  BarChart, 
   Calendar, 
   FileText, 
   Home, 
@@ -49,11 +47,6 @@ const navItems: NavItem[] = [
     label: "Clientes",
     href: "/clients",
     icon: Users,
-  },
-  {
-    label: "Métricas",
-    href: "/metrics",
-    icon: BarChart,
   },
   {
     label: "Conectar",
