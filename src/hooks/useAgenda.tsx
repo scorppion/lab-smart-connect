@@ -1,6 +1,7 @@
 
 import { useState } from "react";
-import { startOfWeek, addDays } from "date-fns";
+import { startOfWeek, addDays, parse } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 // Dados de exemplo
 const professionals = [
@@ -14,6 +15,9 @@ const appointments = [
   { id: 2, clientName: "Maria Silva", service: "Limpeza de Pele", professionalId: 2, date: new Date(2025, 4, 10, 11, 0), duration: 60 },
   { id: 3, clientName: "Ricardo Almeida", service: "Massagem", professionalId: 3, date: new Date(2025, 4, 10, 14, 0), duration: 50 },
   { id: 4, clientName: "Paula Costa", service: "Corte de Cabelo", professionalId: 1, date: new Date(2025, 4, 11, 9, 30), duration: 30 },
+  { id: 5, clientName: "João Oliveira", service: "Barba", professionalId: 1, date: new Date(2025, 4, 12, 13, 0), duration: 20 },
+  { id: 6, clientName: "Lúcia Ferreira", service: "Limpeza Facial", professionalId: 2, date: new Date(2025, 4, 13, 15, 30), duration: 45 },
+  { id: 7, clientName: "Marcelo Santos", service: "Massagem Relaxante", professionalId: 3, date: new Date(2025, 4, 14, 10, 0), duration: 60 },
 ];
 
 // Gerar time slots
@@ -33,7 +37,7 @@ export const useAgenda = () => {
   const timeSlots = generateTimeSlots();
   
   // Gerar dias da semana a partir do dia atual
-  const startOfCurrentWeek = startOfWeek(new Date(), { weekStartsOn: 0 });
+  const startOfCurrentWeek = date ? startOfWeek(date, { weekStartsOn: 0 }) : startOfWeek(new Date(), { weekStartsOn: 0 });
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(startOfCurrentWeek, i));
 
   const handleNewAppointment = () => {

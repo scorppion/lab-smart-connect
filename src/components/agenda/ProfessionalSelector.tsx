@@ -16,6 +16,7 @@ interface ProfessionalSelectorProps {
   selectedProfessional: string;
   setSelectedProfessional: (value: string) => void;
   isCardView?: boolean;
+  className?: string;
 }
 
 export const ProfessionalSelector = ({
@@ -23,10 +24,11 @@ export const ProfessionalSelector = ({
   selectedProfessional,
   setSelectedProfessional,
   isCardView = false,
+  className,
 }: ProfessionalSelectorProps) => {
   if (isCardView) {
     return (
-      <Card>
+      <Card className={className}>
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium">Profissionais</CardTitle>
         </CardHeader>
@@ -57,9 +59,9 @@ export const ProfessionalSelector = ({
   }
 
   return (
-    <div className="w-full sm:w-[180px]">
+    <div className={cn("w-full sm:w-[180px]", className)}>
       <Select value={selectedProfessional} onValueChange={setSelectedProfessional}>
-        <SelectTrigger className="w-full">
+        <SelectTrigger>
           <SelectValue placeholder="Selecione um profissional" />
         </SelectTrigger>
         <SelectContent>
