@@ -122,18 +122,20 @@ const Agenda = () => {
                     </PopoverContent>
                   </Popover>
 
-                  <Select value={selectedProfessional} onValueChange={setSelectedProfessional} className="w-full sm:w-auto">
-                    <SelectTrigger className="w-full sm:w-[180px]">
-                      <SelectValue placeholder="Selecione um profissional" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {professionals.map((professional) => (
-                        <SelectItem key={professional.id} value={professional.id.toString()}>
-                          {professional.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="w-full sm:w-[180px]">
+                    <Select value={selectedProfessional} onValueChange={setSelectedProfessional}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecione um profissional" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {professionals.map((professional) => (
+                          <SelectItem key={professional.id} value={professional.id.toString()}>
+                            {professional.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
                 <Tabs defaultValue="day" className="w-full sm:w-auto">
