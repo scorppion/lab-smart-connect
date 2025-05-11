@@ -35,12 +35,12 @@ const Agenda = () => {
   };
 
   return (
-    <div className="space-y-4 animate-fadeIn">
+    <div className="space-y-4 animate-fadeIn w-full max-w-[1920px] mx-auto">
       <AgendaHeader onNewAppointment={handleNewAppointment} />
 
       <div className="flex flex-col lg:flex-row gap-4">
         {/* Sidebar - Hidden on mobile, visible on desktop */}
-        <div className="hidden lg:block w-64 space-y-4">
+        <div className="hidden lg:block w-64 max-w-[280px] space-y-4 flex-shrink-0">
           <DateSelector 
             date={date} 
             setDate={setDate} 
@@ -55,7 +55,7 @@ const Agenda = () => {
         </div>
 
         {/* Main content */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <Card className="h-full">
             <CardHeader className="space-y-4">
               {/* Mobile Controls */}
@@ -100,7 +100,7 @@ const Agenda = () => {
 
               {/* Tablet/Desktop Controls */}
               <div className="hidden lg:flex lg:justify-between lg:items-center gap-4">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-4 flex-wrap">
                   <DateSelector 
                     date={date} 
                     setDate={setDate} 
@@ -110,6 +110,7 @@ const Agenda = () => {
                     professionals={professionals}
                     selectedProfessional={selectedProfessional}
                     setSelectedProfessional={setSelectedProfessional}
+                    className="w-auto min-w-[200px]"
                   />
                 </div>
                 

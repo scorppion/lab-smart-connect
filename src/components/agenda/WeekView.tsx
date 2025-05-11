@@ -96,9 +96,12 @@ export const WeekView = ({ weekDays, timeSlots, appointments, selectedProfession
   // Desktop/Tablet view with time slots and days
   const renderDesktopView = () => {
     return (
-      <ScrollArea className="h-[600px]">
-        <div className="grid grid-cols-8 gap-1 min-w-[800px]">
+      <ScrollArea className="h-[600px] max-h-[calc(100vh-300px)]">
+        <div className="grid grid-cols-8 gap-1 min-w-[800px] w-full">
+          {/* Time column header */}
           <div className="h-10"></div>
+          
+          {/* Day column headers */}
           {weekDays.map((day, i) => (
             <div
               key={i}
@@ -116,12 +119,15 @@ export const WeekView = ({ weekDays, timeSlots, appointments, selectedProfession
             </div>
           ))}
 
+          {/* Time slots and appointments */}
           {timeSlots.map((slot, slotIndex) => (
             <React.Fragment key={slotIndex}>
-              <div className="border-t border-border text-xs text-muted-foreground p-2 text-right">
+              {/* Time label */}
+              <div className="border-t border-border text-xs text-muted-foreground p-2 text-right w-16 flex-shrink-0">
                 {`${slot.hour.toString().padStart(2, '0')}:${slot.minute.toString().padStart(2, '0')}`}
               </div>
               
+              {/* Day cells */}
               {weekDays.map((day, dayIndex) => {
                 const cellAppointments = appointments.filter((apt) => {
                   if (apt.professionalId.toString() !== selectedProfessional) return false;

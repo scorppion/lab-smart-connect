@@ -32,7 +32,7 @@ export const ProfessionalSelector = ({
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium">Profissionais</CardTitle>
         </CardHeader>
-        <CardContent className="pt-0 space-y-3">
+        <CardContent className="pt-0 space-y-3 max-h-[300px] overflow-y-auto">
           {professionals.map((professional) => (
             <div
               key={professional.id}
@@ -44,7 +44,7 @@ export const ProfessionalSelector = ({
               )}
               onClick={() => setSelectedProfessional(professional.id.toString())}
             >
-              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                 <User size={16} className="text-primary" />
               </div>
               <div>
@@ -59,9 +59,9 @@ export const ProfessionalSelector = ({
   }
 
   return (
-    <div className={cn("w-full sm:w-[180px]", className)}>
+    <div className={className}>
       <Select value={selectedProfessional} onValueChange={setSelectedProfessional}>
-        <SelectTrigger>
+        <SelectTrigger className="w-full">
           <SelectValue placeholder="Selecione um profissional" />
         </SelectTrigger>
         <SelectContent>
