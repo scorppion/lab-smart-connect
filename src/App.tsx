@@ -10,7 +10,6 @@ import Services from "./pages/Services";
 import Agenda from "./pages/Agenda";
 import Chats from "./pages/Chats";
 import Clients from "./pages/Clients";
-import Metrics from "./pages/Metrics";
 import Connect from "./pages/Connect";
 import NotFound from "./pages/NotFound";
 
@@ -28,7 +27,6 @@ const App = () => (
           <Route path="/agenda" element={<MainLayout><Agenda /></MainLayout>} />
           <Route path="/chats" element={<MainLayout><Chats /></MainLayout>} />
           <Route path="/clients" element={<MainLayout><Clients /></MainLayout>} />
-          <Route path="/metrics" element={<MainLayout><Metrics /></MainLayout>} />
           <Route path="/connect" element={<MainLayout><Connect /></MainLayout>} />
           <Route path="*" element={<NotFound />} />
         </Routes>

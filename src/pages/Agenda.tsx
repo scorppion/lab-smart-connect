@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Dados de exemplo
 const professionals = [
@@ -34,6 +35,7 @@ for (let i = 8; i < 19; i++) {
 const Agenda = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [selectedProfessional, setSelectedProfessional] = useState<string>("1");
+  const isMobile = useIsMobile();
 
   // Gerar dias da semana a partir do dia atual
   const startOfCurrentWeek = startOfWeek(new Date(), { weekStartsOn: 0 });
@@ -41,68 +43,70 @@ const Agenda = () => {
 
   return (
     <div className="space-y-6 animate-fadeIn">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <h1 className="text-2xl font-bold tracking-tight">Agenda</h1>
         <Button>
           <Plus className="mr-2 h-4 w-4" /> Novo Agendamento
         </Button>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-6">
-        {/* Sidebar */}
-        <div className="w-full md:w-64 space-y-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Calendário</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-                className="w-full"
-              />
-            </CardContent>
-          </Card>
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Sidebar - renderizado como um bloco superior em mobile */}
+        <div className="w-full lg:w-64 space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium">Calendário</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={setDate}
+                  className="w-full pointer-events-auto"
+                />
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Profissionais</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0 space-y-3">
-              {professionals.map((professional) => (
-                <div
-                  key={professional.id}
-                  className={cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-md text-sm cursor-pointer",
-                    selectedProfessional === professional.id.toString()
-                      ? "bg-primary/10 text-primary font-medium"
-                      : "hover:bg-secondary"
-                  )}
-                  onClick={() => setSelectedProfessional(professional.id.toString())}
-                >
-                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    <User size={16} className="text-primary" />
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium">Profissionais</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0 space-y-3">
+                {professionals.map((professional) => (
+                  <div
+                    key={professional.id}
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2 rounded-md text-sm cursor-pointer",
+                      selectedProfessional === professional.id.toString()
+                        ? "bg-primary/10 text-primary font-medium"
+                        : "hover:bg-secondary"
+                    )}
+                    onClick={() => setSelectedProfessional(professional.id.toString())}
+                  >
+                    <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                      <User size={16} className="text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-medium">{professional.name}</p>
+                      <p className="text-xs text-muted-foreground">{professional.specialty}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium">{professional.name}</p>
-                    <p className="text-xs text-muted-foreground">{professional.specialty}</p>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         {/* Main content */}
         <div className="flex-1">
           <Card className="h-full">
             <CardHeader>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="outline" className="justify-start">
+                      <Button variant="outline" className="w-full sm:w-auto justify-start">
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {date ? format(date, "PPP", { locale: ptBR }) : <span>Selecione uma data</span>}
                       </Button>
@@ -113,12 +117,13 @@ const Agenda = () => {
                         selected={date}
                         onSelect={setDate}
                         initialFocus
+                        className="pointer-events-auto"
                       />
                     </PopoverContent>
                   </Popover>
 
-                  <Select value={selectedProfessional} onValueChange={setSelectedProfessional}>
-                    <SelectTrigger className="w-[180px]">
+                  <Select value={selectedProfessional} onValueChange={setSelectedProfessional} className="w-full sm:w-auto">
+                    <SelectTrigger className="w-full sm:w-[180px]">
                       <SelectValue placeholder="Selecione um profissional" />
                     </SelectTrigger>
                     <SelectContent>
@@ -131,8 +136,8 @@ const Agenda = () => {
                   </Select>
                 </div>
 
-                <Tabs defaultValue="day">
-                  <TabsList>
+                <Tabs defaultValue="day" className="w-full sm:w-auto">
+                  <TabsList className="w-full sm:w-auto grid grid-cols-2">
                     <TabsTrigger value="day">Dia</TabsTrigger>
                     <TabsTrigger value="week">Semana</TabsTrigger>
                   </TabsList>
@@ -140,10 +145,10 @@ const Agenda = () => {
               </div>
             </CardHeader>
 
-            <CardContent>
+            <CardContent className="p-0 sm:p-6">
               <Tabs defaultValue="day" className="w-full">
-                <TabsContent value="day" className="mt-0">
-                  <div className="relative min-h-[600px] mt-4">
+                <TabsContent value="day" className="mt-0 overflow-x-auto">
+                  <div className="relative min-h-[600px] mt-4 w-full min-w-[500px]">
                     {timeSlots.map((slot, index) => {
                       const timeLabel = `${slot.hour.toString().padStart(2, '0')}:${slot.minute.toString().padStart(2, '0')}`;
                       
@@ -184,8 +189,8 @@ const Agenda = () => {
                   </div>
                 </TabsContent>
 
-                <TabsContent value="week" className="mt-0">
-                  <div className="grid grid-cols-8 gap-1 mt-4">
+                <TabsContent value="week" className="mt-0 overflow-x-auto">
+                  <div className="grid grid-cols-8 gap-1 mt-4 min-w-[800px]">
                     <div className="h-10"></div>
                     {weekDays.map((day, i) => (
                       <div
