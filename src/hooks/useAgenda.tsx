@@ -3,9 +3,10 @@ import { useState } from "react";
 import { startOfWeek, addDays, parse, addMinutes } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Appointment } from "@/types/appointment";
+import { Professional } from "@/components/agenda/ProfessionalSelector";
 
 // Dados de exemplo
-const professionals = [
+const professionals: Professional[] = [
   { id: "1", name: "Dr. Carlos Silva", specialty: "Cabelo" },
   { id: "2", name: "Dra. Ana Souza", specialty: "Pele" },
   { id: "3", name: "Dr. Roberto Martins", specialty: "Massagem" },

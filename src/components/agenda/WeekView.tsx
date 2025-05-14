@@ -5,25 +5,12 @@ import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Appointment } from "@/types/appointment";
+import { Professional } from "../agenda/ProfessionalSelector";
 
 interface TimeSlot {
   hour: number;
   minute: number;
-}
-
-interface Appointment {
-  id: number;
-  clientName: string;
-  service: string;
-  professionalId: number;
-  date: Date;
-  duration: number;
-}
-
-interface Professional {
-  id: number;
-  name: string;
-  specialty: string;
 }
 
 interface WeekViewProps {
@@ -46,9 +33,9 @@ export const WeekView = ({ weekDays, timeSlots, appointments, selectedProfession
       <div className="space-y-6">
         {weekDays.map((day, dayIndex) => {
           const dayAppointments = filteredAppointments.filter((apt) => {
-            const aptDay = apt.date.getDate();
-            const aptMonth = apt.date.getMonth();
-            const aptYear = apt.date.getFullYear();
+            const aptDay = apt.startTime.getDate();
+            const aptMonth = apt.startTime.getMonth();
+            const aptYear = apt.startTime.getFullYear();
             
             const cellDay = day.getDate();
             const cellMonth = day.getMonth();
@@ -77,19 +64,19 @@ export const WeekView = ({ weekDays, timeSlots, appointments, selectedProfession
                       <div className="flex justify-between items-start">
                         <div>
                           <p className="font-medium">{appointment.clientName}</p>
-                          <p className="text-sm text-muted-foreground">{appointment.service}</p>
+                          <p className="text-sm text-muted-foreground">{appointment.serviceName}</p>
                           {selectedProfessional === "all" && (
                             <p className="text-xs text-primary mt-1">
-                              {professionals.find(p => p.id === appointment.professionalId)?.name}
+                              {professionals.find(p => p.id.toString() === appointment.professionalId.toString())?.name}
                             </p>
                           )}
                         </div>
                         <div className="text-right">
                           <p className="text-sm font-medium">
-                            {format(appointment.date, "HH:mm")}
+                            {format(appointment.startTime, "HH:mm")}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {appointment.duration}min
+                            {Math.round((appointment.endTime.getTime() - appointment.startTime.getTime()) / 60000)}min
                           </p>
                         </div>
                       </div>
@@ -145,11 +132,11 @@ export const WeekView = ({ weekDays, timeSlots, appointments, selectedProfession
               {/* Day cells */}
               {weekDays.map((day, dayIndex) => {
                 const cellAppointments = filteredAppointments.filter((apt) => {
-                  const aptDay = apt.date.getDate();
-                  const aptMonth = apt.date.getMonth();
-                  const aptYear = apt.date.getFullYear();
-                  const aptHour = apt.date.getHours();
-                  const aptMinute = apt.date.getMinutes();
+                  const aptDay = apt.startTime.getDate();
+                  const aptMonth = apt.startTime.getMonth();
+                  const aptYear = apt.startTime.getFullYear();
+                  const aptHour = apt.startTime.getHours();
+                  const aptMinute = apt.startTime.getMinutes();
                   
                   const cellDay = day.getDate();
                   const cellMonth = day.getMonth();
@@ -174,10 +161,10 @@ export const WeekView = ({ weekDays, timeSlots, appointments, selectedProfession
                         key={appointment.id}
                         className="absolute inset-0.5 bg-primary/10 rounded text-xs p-1 truncate border-l-2 border-primary"
                       >
-                        {appointment.clientName} - {appointment.service}
+                        {appointment.clientName} - {appointment.serviceName}
                         {selectedProfessional === "all" && (
                           <span className="text-xs text-primary ml-1">
-                            ({professionals.find(p => p.id === appointment.professionalId)?.name})
+                            ({professionals.find(p => p.id.toString() === appointment.professionalId.toString())?.name})
                           </span>
                         )}
                       </div>

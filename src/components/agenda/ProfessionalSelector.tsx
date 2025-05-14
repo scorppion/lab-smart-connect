@@ -5,8 +5,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-interface Professional {
-  id: number;
+// Updated to accept string or number IDs
+export interface Professional {
+  id: string | number;
   name: string;
   specialty: string;
 }
