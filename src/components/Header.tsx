@@ -12,9 +12,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { LogOut, Settings, User } from "lucide-react";
+import { LogOut, Menu, Settings, User } from "lucide-react";
 
-export function Header() {
+interface HeaderProps {
+  setMobileMenuOpen?: (open: boolean) => void;
+}
+
+export function Header({ setMobileMenuOpen }: HeaderProps) {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
 
   const getInitials = (name: string) => {
@@ -28,6 +32,16 @@ export function Header() {
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
       <div className="flex flex-1 items-center gap-2">
+        {setMobileMenuOpen && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            onClick={() => setMobileMenuOpen(true)}
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+        )}
         <Link to="/" className="flex items-center">
           <span className="text-xl font-bold">BeautyCenter</span>
         </Link>

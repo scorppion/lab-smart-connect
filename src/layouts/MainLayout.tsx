@@ -21,7 +21,6 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
     <div className="min-h-screen flex flex-col md:flex-row bg-background">
       <AppSidebar mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
       <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
-        {/* @ts-ignore - Header should accept setMobileMenuOpen but TS doesn't know about it */}
         <Header setMobileMenuOpen={setMobileMenuOpen} />
         <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
       </div>

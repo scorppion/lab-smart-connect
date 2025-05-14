@@ -10,6 +10,7 @@ import Clients from "./pages/Clients";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import UserManagement from "./pages/Admin/UserManagement";
+import Services from "./pages/Services";
 import { useAuth } from "./hooks/useAuth";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -45,24 +46,64 @@ function App() {
         <Route path="/" element={
           <ProtectedRoute>
             <MainLayout>
-              <Routes>
-                <Route index element={<Index />} />
-                <Route path="agenda" element={<Agenda />} />
-                <Route path="chats" element={<Chats />} />
-                <Route path="connect" element={<Connect />} />
-                <Route path="clients" element={<Clients />} />
-                
-                {/* Admin routes */}
-                <Route path="admin">
-                  <Route path="users" element={
-                    <AdminRoute>
-                      <UserManagement />
-                    </AdminRoute>
-                  } />
-                </Route>
-                
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <Index />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/agenda" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <Agenda />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/services" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <Services />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/chats" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <Chats />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/connect" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <Connect />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/clients" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <Clients />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        {/* Admin routes */}
+        <Route path="/admin/users" element={
+          <AdminRoute>
+            <MainLayout>
+              <UserManagement />
+            </MainLayout>
+          </AdminRoute>
+        } />
+        
+        <Route path="*" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <NotFound />
             </MainLayout>
           </ProtectedRoute>
         } />
