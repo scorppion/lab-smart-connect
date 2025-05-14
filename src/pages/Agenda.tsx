@@ -14,10 +14,10 @@ import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Appointment } from "@/types/appointment";
+import { AppointmentDialog } from "@/components/agenda/AppointmentDialog";
 
 const Agenda = () => {
   const [currentView, setCurrentView] = useState("day");
-  const [showMobileCalendar, setShowMobileCalendar] = useState(false);
   
   const {
     date,
@@ -29,6 +29,10 @@ const Agenda = () => {
     timeSlots,
     weekDays,
     handleNewAppointment,
+    isAppointmentDialogOpen,
+    handleCloseAppointmentDialog,
+    handleSaveAppointment,
+    appointmentDate,
   } = useAgenda();
 
   const handleViewChange = (view: string) => {
@@ -40,9 +44,13 @@ const Agenda = () => {
     // Implement appointment view/edit modal here
   };
 
+  const handleEmptySlotClick = (date?: Date) => {
+    handleNewAppointment(date);
+  };
+
   return (
     <div className="space-y-4 animate-fadeIn w-full max-w-[1920px] mx-auto">
-      <AgendaHeader onNewAppointment={handleNewAppointment} />
+      <AgendaHeader onNewAppointment={() => handleNewAppointment()} />
 
       <div className="flex flex-col lg:flex-row gap-4">
         {/* Sidebar - Hidden on mobile, visible on desktop */}
@@ -51,14 +59,14 @@ const Agenda = () => {
             date={date} 
             setDate={setDate} 
             isCardView={true} 
-            className="w-[320px]"
+            className="w-[350px]"
           />
           <ProfessionalSelector 
             professionals={professionals}
             selectedProfessional={selectedProfessional}
             setSelectedProfessional={setSelectedProfessional}
             isCardView={true}
-            className="w-[320px]"
+            className="w-[350px]"
           />
         </div>
 
@@ -103,7 +111,7 @@ const Agenda = () => {
                   className="flex-1 mx-2"
                 />
 
-                <Button variant="outline" onClick={handleNewAppointment} size="icon">
+                <Button variant="outline" onClick={() => handleNewAppointment()} size="icon">
                   <Users className="h-5 w-5" />
                 </Button>
               </div>
@@ -157,6 +165,7 @@ const Agenda = () => {
                     selectedProfessional={selectedProfessional}
                     appointments={appointments}
                     onAppointmentClick={handleAppointmentClick}
+                    onEmptySlotClick={handleEmptySlotClick}
                   />
                 </TabsContent>
 
@@ -167,6 +176,7 @@ const Agenda = () => {
                     appointments={appointments}
                     selectedProfessional={selectedProfessional}
                     professionals={professionals}
+                    onEmptySlotClick={handleEmptySlotClick}
                   />
                 </TabsContent>
               </Tabs>
@@ -174,6 +184,15 @@ const Agenda = () => {
           </Card>
         </div>
       </div>
+
+      {/* Appointment Dialog */}
+      <AppointmentDialog
+        isOpen={isAppointmentDialogOpen}
+        onClose={handleCloseAppointmentDialog}
+        onSave={handleSaveAppointment}
+        initialDate={appointmentDate}
+        professionals={professionals}
+      />
     </div>
   );
 };

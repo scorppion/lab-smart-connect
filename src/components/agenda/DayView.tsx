@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { format, addHours, startOfDay, isSameDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -11,6 +12,7 @@ interface DayViewProps {
   appointments: Appointment[];
   selectedProfessional: string;
   onAppointmentClick?: (appointment: Appointment) => void;
+  onEmptySlotClick?: (date?: Date) => void;
   timeSlots?: { hour: number, minute: number }[];
 }
 
@@ -22,6 +24,7 @@ export const DayView: React.FC<DayViewProps> = ({
   appointments,
   selectedProfessional,
   onAppointmentClick = () => {},
+  onEmptySlotClick = () => {},
   timeSlots: externalTimeSlots,
 }) => {
   const [timeSlots, setTimeSlots] = useState<Date[]>([]);
@@ -43,6 +46,7 @@ export const DayView: React.FC<DayViewProps> = ({
       
       for (let hour = BUSINESS_HOURS_START; hour <= BUSINESS_HOURS_END; hour++) {
         slots.push(addHours(dayStart, hour));
+        slots.push(addHours(dayStart, hour + 0.5));
       }
       
       setTimeSlots(slots);
@@ -53,6 +57,7 @@ export const DayView: React.FC<DayViewProps> = ({
     return appointments.filter(appointment => 
       isSameDay(appointment.startTime, time) && 
       appointment.startTime.getHours() === time.getHours() &&
+      appointment.startTime.getMinutes() === time.getMinutes() &&
       (selectedProfessional === "all" || selectedProfessional === appointment.professionalId.toString())
     );
   };
@@ -102,6 +107,11 @@ export const DayView: React.FC<DayViewProps> = ({
                   <Button 
                     variant="ghost" 
                     className="h-12 w-full justify-start text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                    onClick={() => {
+                      const slotDate = new Date(date);
+                      slotDate.setHours(time.getHours(), time.getMinutes());
+                      onEmptySlotClick(slotDate);
+                    }}
                   >
                     + Adicionar agendamento
                   </Button>
