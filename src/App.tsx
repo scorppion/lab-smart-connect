@@ -1,38 +1,74 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { MainLayout } from "./layouts/MainLayout";
+import { Toaster } from "./components/ui/toaster";
 import Index from "./pages/Index";
-import Services from "./pages/Services";
 import Agenda from "./pages/Agenda";
 import Chats from "./pages/Chats";
-import Clients from "./pages/Clients";
 import Connect from "./pages/Connect";
+import Clients from "./pages/Clients";
 import NotFound from "./pages/NotFound";
+import Login from "./pages/Login";
+import UserManagement from "./pages/Admin/UserManagement";
+import { useAuth } from "./hooks/useAuth";
 
-const queryClient = new QueryClient();
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated } = useAuth();
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+  
+  return <>{children}</>;
+};
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<MainLayout><Index /></MainLayout>} />
-          <Route path="/services" element={<MainLayout><Services /></MainLayout>} />
-          <Route path="/agenda" element={<MainLayout><Agenda /></MainLayout>} />
-          <Route path="/chats" element={<MainLayout><Chats /></MainLayout>} />
-          <Route path="/clients" element={<MainLayout><Clients /></MainLayout>} />
-          <Route path="/connect" element={<MainLayout><Connect /></MainLayout>} />
+const AdminRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, isAdmin } = useAuth();
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+  
+  if (!isAdmin) {
+    return <Navigate to="/" />;
+  }
+  
+  return <>{children}</>;
+};
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        
+        <Route path="/" element={
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        }>
+          <Route index element={<Index />} />
+          <Route path="agenda" element={<Agenda />} />
+          <Route path="chats" element={<Chats />} />
+          <Route path="connect" element={<Connect />} />
+          <Route path="clients" element={<Clients />} />
+          
+          {/* Admin routes */}
+          <Route path="admin">
+            <Route path="users" element={
+              <AdminRoute>
+                <UserManagement />
+              </AdminRoute>
+            } />
+          </Route>
+          
           <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+        </Route>
+      </Routes>
+      
+      <Toaster />
+    </Router>
+  );
+}
 
 export default App;

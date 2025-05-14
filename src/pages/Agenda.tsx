@@ -155,6 +155,7 @@ const Agenda = () => {
                     timeSlots={timeSlots}
                     appointments={appointments}
                     selectedProfessional={selectedProfessional}
+                    professionals={professionals}
                   />
                 </TabsContent>
               </Tabs>

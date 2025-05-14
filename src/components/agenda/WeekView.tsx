@@ -20,22 +20,32 @@ interface Appointment {
   duration: number;
 }
 
+interface Professional {
+  id: number;
+  name: string;
+  specialty: string;
+}
+
 interface WeekViewProps {
   weekDays: Date[];
   timeSlots: TimeSlot[];
   appointments: Appointment[];
   selectedProfessional: string;
+  professionals: Professional[];
 }
 
-export const WeekView = ({ weekDays, timeSlots, appointments, selectedProfessional }: WeekViewProps) => {
+export const WeekView = ({ weekDays, timeSlots, appointments, selectedProfessional, professionals }: WeekViewProps) => {
+  // Filter appointments based on selected professional or show all if "all" is selected
+  const filteredAppointments = appointments.filter(
+    (apt) => selectedProfessional === "all" || apt.professionalId.toString() === selectedProfessional
+  );
+
   // Mobile view for appointments as cards grouped by day
   const renderMobileView = () => {
     return (
       <div className="space-y-6">
         {weekDays.map((day, dayIndex) => {
-          const dayAppointments = appointments.filter((apt) => {
-            if (apt.professionalId.toString() !== selectedProfessional) return false;
-            
+          const dayAppointments = filteredAppointments.filter((apt) => {
             const aptDay = apt.date.getDate();
             const aptMonth = apt.date.getMonth();
             const aptYear = apt.date.getFullYear();
@@ -68,6 +78,11 @@ export const WeekView = ({ weekDays, timeSlots, appointments, selectedProfession
                         <div>
                           <p className="font-medium">{appointment.clientName}</p>
                           <p className="text-sm text-muted-foreground">{appointment.service}</p>
+                          {selectedProfessional === "all" && (
+                            <p className="text-xs text-primary mt-1">
+                              {professionals.find(p => p.id === appointment.professionalId)?.name}
+                            </p>
+                          )}
                         </div>
                         <div className="text-right">
                           <p className="text-sm font-medium">
@@ -129,9 +144,7 @@ export const WeekView = ({ weekDays, timeSlots, appointments, selectedProfession
               
               {/* Day cells */}
               {weekDays.map((day, dayIndex) => {
-                const cellAppointments = appointments.filter((apt) => {
-                  if (apt.professionalId.toString() !== selectedProfessional) return false;
-                  
+                const cellAppointments = filteredAppointments.filter((apt) => {
                   const aptDay = apt.date.getDate();
                   const aptMonth = apt.date.getMonth();
                   const aptYear = apt.date.getFullYear();
@@ -162,6 +175,11 @@ export const WeekView = ({ weekDays, timeSlots, appointments, selectedProfession
                         className="absolute inset-0.5 bg-primary/10 rounded text-xs p-1 truncate border-l-2 border-primary"
                       >
                         {appointment.clientName} - {appointment.service}
+                        {selectedProfessional === "all" && (
+                          <span className="text-xs text-primary ml-1">
+                            ({professionals.find(p => p.id === appointment.professionalId)?.name})
+                          </span>
+                        )}
                       </div>
                     ))}
                   </div>

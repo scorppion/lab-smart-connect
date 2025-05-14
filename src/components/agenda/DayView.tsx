@@ -25,16 +25,17 @@ interface DayViewProps {
 }
 
 export const DayView = ({ selectedProfessional, timeSlots, appointments }: DayViewProps) => {
+  // Filter appointments based on selected professional (or show all if "all" is selected)
+  const filteredAppointments = appointments.filter(
+    (apt) => selectedProfessional === "all" || apt.professionalId.toString() === selectedProfessional
+  );
+
   // Mobile view for appointments as cards
   const renderMobileView = () => {
-    const filteredAppointments = appointments.filter(
-      (apt) => apt.professionalId.toString() === selectedProfessional
-    );
-
     if (filteredAppointments.length === 0) {
       return (
         <div className="text-center py-8 text-muted-foreground">
-          Nenhum agendamento para este profissional hoje.
+          Nenhum agendamento para {selectedProfessional === "all" ? "os profissionais" : "este profissional"} hoje.
         </div>
       );
     }
@@ -47,6 +48,11 @@ export const DayView = ({ selectedProfessional, timeSlots, appointments }: DayVi
               <div>
                 <p className="font-medium">{appointment.clientName}</p>
                 <p className="text-sm text-muted-foreground">{appointment.service}</p>
+                {selectedProfessional === "all" && (
+                  <p className="text-xs text-primary mt-1">
+                    {appointments.find(p => p.professionalId === appointment.professionalId)?.clientName}
+                  </p>
+                )}
               </div>
               <div className="text-right">
                 <p className="text-sm font-medium">
@@ -71,9 +77,9 @@ export const DayView = ({ selectedProfessional, timeSlots, appointments }: DayVi
           {timeSlots.map((slot, index) => {
             const timeLabel = `${slot.hour.toString().padStart(2, '0')}:${slot.minute.toString().padStart(2, '0')}`;
             
-            // Filtrar agendamentos para este horário e profissional
+            // Filter appointments for this time slot and selected professional(s)
             const slotAppointments = appointments.filter((apt) => {
-              if (apt.professionalId.toString() !== selectedProfessional) return false;
+              if (!(selectedProfessional === "all" || apt.professionalId.toString() === selectedProfessional)) return false;
               
               const aptHour = apt.date.getHours();
               const aptMinute = apt.date.getMinutes();
@@ -93,12 +99,19 @@ export const DayView = ({ selectedProfessional, timeSlots, appointments }: DayVi
                       style={{
                         top: "0",
                         height: `${appointment.duration}px`,
+                        minHeight: "25px",
+                        maxHeight: `${appointment.duration * 2}px`,
                       }}
                     >
                       <p className="font-medium truncate">{appointment.clientName}</p>
                       <p className="text-xs text-muted-foreground truncate">
                         {appointment.service}
                       </p>
+                      {selectedProfessional === "all" && (
+                        <p className="text-xs text-primary truncate">
+                          {professionals.find(p => p.id === appointment.professionalId)?.name}
+                        </p>
+                      )}
                     </div>
                   ))}
                 </div>

@@ -32,7 +32,7 @@ const generateTimeSlots = () => {
 
 export const useAgenda = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [selectedProfessional, setSelectedProfessional] = useState<string>("1");
+  const [selectedProfessional, setSelectedProfessional] = useState<string>("all");
   
   const timeSlots = generateTimeSlots();
   

@@ -1,6 +1,6 @@
 
 import React from "react";
-import { User } from "lucide-react";
+import { User, Users } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -33,6 +33,25 @@ export const ProfessionalSelector = ({
           <CardTitle className="text-sm font-medium">Profissionais</CardTitle>
         </CardHeader>
         <CardContent className="pt-0 space-y-2 max-h-[260px] overflow-y-auto">
+          <div
+            key="all"
+            className={cn(
+              "flex items-center gap-2 px-2 py-1.5 rounded-md text-sm cursor-pointer",
+              selectedProfessional === "all"
+                ? "bg-primary/10 text-primary font-medium"
+                : "hover:bg-secondary"
+            )}
+            onClick={() => setSelectedProfessional("all")}
+          >
+            <div className="h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <Users size={14} className="text-primary" />
+            </div>
+            <div>
+              <p className="font-medium text-xs leading-tight">Todos os profissionais</p>
+              <p className="text-xs text-muted-foreground">Ver todos</p>
+            </div>
+          </div>
+          
           {professionals.map((professional) => (
             <div
               key={professional.id}
@@ -65,6 +84,7 @@ export const ProfessionalSelector = ({
           <SelectValue placeholder="Selecione um profissional" />
         </SelectTrigger>
         <SelectContent>
+          <SelectItem value="all">Todos os profissionais</SelectItem>
           {professionals.map((professional) => (
             <SelectItem key={professional.id} value={professional.id.toString()}>
               {professional.name}
