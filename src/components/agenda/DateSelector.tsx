@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 interface DateSelectorProps {
   date: Date | undefined;
@@ -18,7 +19,7 @@ interface DateSelectorProps {
 export const DateSelector = ({ date, setDate, isCardView = false, className }: DateSelectorProps) => {
   if (isCardView) {
     return (
-      <Card className={cn("min-w-[280px]", className)}>
+      <Card className={cn("min-w-[320px]", className)}>
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium">Calendário</CardTitle>
         </CardHeader>
@@ -36,10 +37,10 @@ export const DateSelector = ({ date, setDate, isCardView = false, className }: D
               nav: "space-x-1 flex items-center",
               table: "w-full border-collapse space-y-1",
               head_row: "flex w-full justify-between",
-              head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.7rem] text-center",
+              head_cell: "text-muted-foreground rounded-md w-10 font-normal text-[0.7rem] text-center",
               row: "flex w-full mt-1 justify-between",
-              cell: "h-7 w-9 text-center text-xs p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-              day: "h-7 w-7 p-0 font-normal aria-selected:opacity-100 hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+              cell: "h-8 w-10 text-center text-xs p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+              day: "h-8 w-8 p-0 font-normal aria-selected:opacity-100 hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
               day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
               day_today: "bg-accent text-accent-foreground",
               day_outside: "text-muted-foreground opacity-50",
@@ -75,7 +76,3 @@ export const DateSelector = ({ date, setDate, isCardView = false, className }: D
     </div>
   );
 };
-
-// Fix - import the cn utility
-import { cn } from "@/lib/utils";
-

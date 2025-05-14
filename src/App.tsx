@@ -9,6 +9,7 @@ import Connect from "./pages/Connect";
 import Clients from "./pages/Clients";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
+import Profile from "./pages/Profile";
 import UserManagement from "./pages/Admin/UserManagement";
 import Services from "./pages/Services";
 import { useAuth } from "./hooks/useAuth";
@@ -87,6 +88,14 @@ function App() {
           <ProtectedRoute>
             <MainLayout>
               <Clients />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <Profile />
             </MainLayout>
           </ProtectedRoute>
         } />

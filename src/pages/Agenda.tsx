@@ -51,14 +51,14 @@ const Agenda = () => {
             date={date} 
             setDate={setDate} 
             isCardView={true} 
-            className="w-[280px]"
+            className="w-[320px]"
           />
           <ProfessionalSelector 
             professionals={professionals}
             selectedProfessional={selectedProfessional}
             setSelectedProfessional={setSelectedProfessional}
             isCardView={true}
-            className="w-[280px]"
+            className="w-[320px]"
           />
         </div>
 
