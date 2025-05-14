@@ -13,6 +13,7 @@ import { CalendarIcon, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Appointment } from "@/types/appointment";
 
 const Agenda = () => {
   const [currentView, setCurrentView] = useState("day");
@@ -32,6 +33,11 @@ const Agenda = () => {
 
   const handleViewChange = (view: string) => {
     setCurrentView(view);
+  };
+
+  const handleAppointmentClick = (appointment: Appointment) => {
+    console.log("Appointment clicked:", appointment);
+    // Implement appointment view/edit modal here
   };
 
   return (
@@ -143,9 +149,10 @@ const Agenda = () => {
               <Tabs value={currentView} onValueChange={handleViewChange} className="w-full">
                 <TabsContent value="day" className="m-0">
                   <DayView 
+                    date={date}
                     selectedProfessional={selectedProfessional}
-                    timeSlots={timeSlots}
                     appointments={appointments}
+                    onAppointmentClick={handleAppointmentClick}
                   />
                 </TabsContent>
 

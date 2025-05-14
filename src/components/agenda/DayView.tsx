@@ -7,39 +7,53 @@ import { cn } from "@/lib/utils";
 import { Appointment } from "@/types/appointment";
 
 interface DayViewProps {
-  date: Date;
+  date?: Date;
   appointments: Appointment[];
   selectedProfessional: string;
-  onAppointmentClick: (appointment: Appointment) => void;
+  onAppointmentClick?: (appointment: Appointment) => void;
+  timeSlots?: { hour: number, minute: number }[];
 }
 
 const BUSINESS_HOURS_START = 8; // 8 AM
 const BUSINESS_HOURS_END = 18; // 6 PM
 
 export const DayView: React.FC<DayViewProps> = ({
-  date,
+  date = new Date(),
   appointments,
   selectedProfessional,
-  onAppointmentClick,
+  onAppointmentClick = () => {},
+  timeSlots: externalTimeSlots,
 }) => {
   const [timeSlots, setTimeSlots] = useState<Date[]>([]);
 
   useEffect(() => {
-    const slots: Date[] = [];
-    const dayStart = startOfDay(date);
-    
-    for (let hour = BUSINESS_HOURS_START; hour <= BUSINESS_HOURS_END; hour++) {
-      slots.push(addHours(dayStart, hour));
+    // If external timeSlots are provided, convert them to Date objects
+    if (externalTimeSlots) {
+      const currentDate = date ? startOfDay(date) : startOfDay(new Date());
+      const slots = externalTimeSlots.map(slot => {
+        const slotDate = new Date(currentDate);
+        slotDate.setHours(slot.hour, slot.minute);
+        return slotDate;
+      });
+      setTimeSlots(slots);
+    } else {
+      // Otherwise generate timeSlots internally
+      const slots: Date[] = [];
+      const dayStart = startOfDay(date);
+      
+      for (let hour = BUSINESS_HOURS_START; hour <= BUSINESS_HOURS_END; hour++) {
+        slots.push(addHours(dayStart, hour));
+      }
+      
+      setTimeSlots(slots);
     }
-    
-    setTimeSlots(slots);
-  }, [date]);
+  }, [date, externalTimeSlots]);
 
   const getAppointmentsForTimeSlot = (time: Date) => {
     return appointments.filter(appointment => 
       isSameDay(appointment.startTime, time) && 
       appointment.startTime.getHours() === time.getHours() &&
-      (selectedProfessional === "all" || selectedProfessional === appointment.professionalId)
+      (selectedProfessional === "all" || selectedProfessional === appointment.professionalId.toString())
     );
   };
 
