@@ -1,136 +1,102 @@
-
-import React from "react";
-import { Card } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { format } from "date-fns";
-
-interface TimeSlot {
-  hour: number;
-  minute: number;
-}
-
-interface Appointment {
-  id: number;
-  clientName: string;
-  service: string;
-  professionalId: number;
-  date: Date;
-  duration: number;
-}
+import React, { useState, useEffect } from "react";
+import { format, addHours, startOfDay, isSameDay } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { Appointment } from "@/types/appointment";
 
 interface DayViewProps {
-  selectedProfessional: string;
-  timeSlots: TimeSlot[];
+  date: Date;
   appointments: Appointment[];
+  selectedProfessional: string;
+  onAppointmentClick: (appointment: Appointment) => void;
 }
 
-export const DayView = ({ selectedProfessional, timeSlots, appointments }: DayViewProps) => {
-  // Filter appointments based on selected professional (or show all if "all" is selected)
-  const filteredAppointments = appointments.filter(
-    (apt) => selectedProfessional === "all" || apt.professionalId.toString() === selectedProfessional
-  );
+const BUSINESS_HOURS_START = 8; // 8 AM
+const BUSINESS_HOURS_END = 18; // 6 PM
 
-  // Mobile view for appointments as cards
-  const renderMobileView = () => {
-    if (filteredAppointments.length === 0) {
-      return (
-        <div className="text-center py-8 text-muted-foreground">
-          Nenhum agendamento para {selectedProfessional === "all" ? "os profissionais" : "este profissional"} hoje.
-        </div>
-      );
+export const DayView: React.FC<DayViewProps> = ({
+  date,
+  appointments,
+  selectedProfessional,
+  onAppointmentClick,
+}) => {
+  const [timeSlots, setTimeSlots] = useState<Date[]>([]);
+
+  useEffect(() => {
+    const slots: Date[] = [];
+    const dayStart = startOfDay(date);
+    
+    for (let hour = BUSINESS_HOURS_START; hour <= BUSINESS_HOURS_END; hour++) {
+      slots.push(addHours(dayStart, hour));
     }
+    
+    setTimeSlots(slots);
+  }, [date]);
 
-    return (
-      <div className="space-y-4 py-4">
-        {filteredAppointments.map((appointment) => (
-          <Card key={appointment.id} className="p-4 cursor-pointer hover:bg-accent/50">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="font-medium">{appointment.clientName}</p>
-                <p className="text-sm text-muted-foreground">{appointment.service}</p>
-                {selectedProfessional === "all" && (
-                  <p className="text-xs text-primary mt-1">
-                    {appointments.find(p => p.professionalId === appointment.professionalId)?.clientName}
-                  </p>
-                )}
-              </div>
-              <div className="text-right">
-                <p className="text-sm font-medium">
-                  {format(appointment.date, "HH:mm")}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {appointment.duration}min
-                </p>
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
-    );
-  };
-
-  // Desktop/Tablet view with time slots
-  const renderDesktopView = () => {
-    return (
-      <ScrollArea className="h-[600px] max-h-[calc(100vh-300px)]">
-        <div className="relative min-h-[600px] w-full">
-          {timeSlots.map((slot, index) => {
-            const timeLabel = `${slot.hour.toString().padStart(2, '0')}:${slot.minute.toString().padStart(2, '0')}`;
-            
-            // Filter appointments for this time slot and selected professional(s)
-            const slotAppointments = appointments.filter((apt) => {
-              if (!(selectedProfessional === "all" || apt.professionalId.toString() === selectedProfessional)) return false;
-              
-              const aptHour = apt.date.getHours();
-              const aptMinute = apt.date.getMinutes();
-              return aptHour === slot.hour && aptMinute === slot.minute;
-            });
-            
-            return (
-              <div key={index} className="flex">
-                <div className="w-16 flex-shrink-0 py-2 text-xs text-muted-foreground text-right pr-2">
-                  {timeLabel}
-                </div>
-                <div className="flex-1 border-t border-border relative">
-                  {slotAppointments.map((appointment) => (
-                    <div
-                      key={appointment.id}
-                      className="absolute left-0 right-4 ml-1 rounded-md px-2 py-1 text-sm bg-primary/10 border-l-4 border-primary cursor-pointer"
-                      style={{
-                        top: "0",
-                        height: `${appointment.duration}px`,
-                        minHeight: "25px",
-                        maxHeight: `${appointment.duration * 2}px`,
-                      }}
-                    >
-                      <p className="font-medium truncate">{appointment.clientName}</p>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {appointment.service}
-                      </p>
-                      {selectedProfessional === "all" && (
-                        <p className="text-xs text-primary truncate">
-                          {professionals.find(p => p.id === appointment.professionalId)?.name}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </ScrollArea>
+  const getAppointmentsForTimeSlot = (time: Date) => {
+    return appointments.filter(appointment => 
+      isSameDay(appointment.startTime, time) && 
+      appointment.startTime.getHours() === time.getHours() &&
+      (selectedProfessional === "all" || selectedProfessional === appointment.professionalId)
     );
   };
 
   return (
-    <>
-      <div className="md:hidden">
-        {renderMobileView()}
+    <div className="space-y-4">
+      <h3 className="text-lg font-medium">
+        {format(date, "EEEE, d 'de' MMMM", { locale: ptBR })}
+      </h3>
+      
+      <div className="space-y-2">
+        {timeSlots.map((time) => {
+          const timeSlotAppointments = getAppointmentsForTimeSlot(time);
+          
+          return (
+            <div key={time.toISOString()} className="flex items-start gap-2">
+              <div className="w-16 text-sm font-medium pt-2">
+                {format(time, "HH:mm")}
+              </div>
+              
+              <div className="flex-1 min-h-[60px] border-l pl-2">
+                {timeSlotAppointments.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {timeSlotAppointments.map((appointment) => (
+                      <Card 
+                        key={appointment.id}
+                        className={cn(
+                          "w-full sm:w-[calc(50%-8px)] lg:w-[calc(33.33%-8px)] cursor-pointer transition-all hover:shadow-md",
+                          appointment.status === "confirmed" ? "border-green-500 border-l-4" :
+                          appointment.status === "pending" ? "border-yellow-500 border-l-4" :
+                          "border-gray-300 border-l-4"
+                        )}
+                        onClick={() => onAppointmentClick(appointment)}
+                      >
+                        <CardContent className="p-3">
+                          <div className="font-medium">{appointment.clientName}</div>
+                          <div className="text-sm text-muted-foreground">{appointment.serviceName}</div>
+                          <div className="text-xs mt-1">
+                            {format(appointment.startTime, "HH:mm")} - 
+                            {format(appointment.endTime, "HH:mm")}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <Button 
+                    variant="ghost" 
+                    className="h-12 w-full justify-start text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                  >
+                    + Adicionar agendamento
+                  </Button>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
-      <div className="hidden md:block">
-        {renderDesktopView()}
-      </div>
-    </>
+    </div>
   );
 };

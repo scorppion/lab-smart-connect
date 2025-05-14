@@ -1,7 +1,7 @@
 
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { MainLayout } from "./layouts/MainLayout";
-import { Toaster } from "./components/ui/toaster";
+import { Toaster } from "./components/ui/sonner";
 import Index from "./pages/Index";
 import Agenda from "./pages/Agenda";
 import Chats from "./pages/Chats";
@@ -44,26 +44,28 @@ function App() {
         
         <Route path="/" element={
           <ProtectedRoute>
-            <MainLayout />
+            <MainLayout>
+              <Routes>
+                <Route index element={<Index />} />
+                <Route path="agenda" element={<Agenda />} />
+                <Route path="chats" element={<Chats />} />
+                <Route path="connect" element={<Connect />} />
+                <Route path="clients" element={<Clients />} />
+                
+                {/* Admin routes */}
+                <Route path="admin">
+                  <Route path="users" element={
+                    <AdminRoute>
+                      <UserManagement />
+                    </AdminRoute>
+                  } />
+                </Route>
+                
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </MainLayout>
           </ProtectedRoute>
-        }>
-          <Route index element={<Index />} />
-          <Route path="agenda" element={<Agenda />} />
-          <Route path="chats" element={<Chats />} />
-          <Route path="connect" element={<Connect />} />
-          <Route path="clients" element={<Clients />} />
-          
-          {/* Admin routes */}
-          <Route path="admin">
-            <Route path="users" element={
-              <AdminRoute>
-                <UserManagement />
-              </AdminRoute>
-            } />
-          </Route>
-          
-          <Route path="*" element={<NotFound />} />
-        </Route>
+        } />
       </Routes>
       
       <Toaster />

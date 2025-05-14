@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -23,7 +22,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/sonner";
 
 const formSchema = z.object({
   email: z.string().email("Email inválido").min(1, "Email é obrigatório"),
@@ -33,7 +32,6 @@ const formSchema = z.object({
 const Login = () => {
   const { isAuthenticated, login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
   const navigate = useNavigate();
   
   const form = useForm<z.infer<typeof formSchema>>({
@@ -50,22 +48,17 @@ const Login = () => {
       const success = await login(values.email, values.password);
       
       if (success) {
-        toast({
-          title: "Login realizado com sucesso",
+        toast("Login realizado com sucesso", {
           description: "Redirecionando para o painel...",
         });
         navigate("/");
       } else {
-        toast({
-          variant: "destructive",
-          title: "Falha no login",
+        toast("Falha no login", {
           description: "Email ou senha incorretos.",
         });
       }
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Erro no login",
+      toast("Erro no login", {
         description: "Ocorreu um erro ao tentar fazer login.",
       });
     } finally {

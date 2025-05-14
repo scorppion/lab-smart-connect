@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Navigate } from "react-router-dom";
@@ -6,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/sonner";
 import {
   Table,
   TableBody,
@@ -48,7 +47,7 @@ const dummyUsers: User[] = [
 
 const UserManagement = () => {
   const { isAuthenticated, isAdmin } = useAuth();
-  const { toast } = useToast();
+  // Change to use sonner toast instead of useToast
   const [users, setUsers] = useState(dummyUsers);
   const [newUser, setNewUser] = useState({
     name: "",
@@ -70,9 +69,7 @@ const UserManagement = () => {
   const handleCreateUser = () => {
     // Validate form
     if (!newUser.name || !newUser.email || !newUser.password) {
-      toast({
-        variant: "destructive",
-        title: "Dados incompletos",
+      toast("Dados incompletos", {
         description: "Preencha todos os campos obrigatórios.",
       });
       return;
@@ -91,8 +88,7 @@ const UserManagement = () => {
       },
     ]);
 
-    toast({
-      title: "Usuário criado",
+    toast("Usuário criado", {
       description: `Usuário ${newUser.name} criado com sucesso.`,
     });
 
