@@ -5,12 +5,11 @@ import { ptBR } from "date-fns/locale";
 import { Appointment } from "@/types/appointment";
 import { Professional } from "@/components/agenda/ProfessionalSelector";
 
-// Dados de exemplo
+// Dados de exemplo - Removed the duplicate "Todos os profissionais" entry
 const professionals: Professional[] = [
   { id: "1", name: "Dr. Carlos Silva", specialty: "Cabelo" },
   { id: "2", name: "Dra. Ana Souza", specialty: "Pele" },
   { id: "3", name: "Dr. Roberto Martins", specialty: "Massagem" },
-  { id: "all", name: "Todos os profissionais", specialty: "" },
 ];
 
 // Convert the old appointment format to the new Appointment type
