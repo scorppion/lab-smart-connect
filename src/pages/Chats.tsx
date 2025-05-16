@@ -53,22 +53,7 @@ const Chats = () => {
   const [newMessage, setNewMessage] = useState("");
   const { user } = useUser();
 
-  const [socket, setSocket] = useState<any>(null);
-
-  useEffect(() => {
-    const newSocket = io('http://0.0.0.0:5000');
-    setSocket(newSocket);
-
-    if (user?.id) {
-      newSocket.emit('joinRoom', user.id);
-    }
-
-    newSocket.on('newMessage', (message: Message) => {
-      setMessages(prev => [...prev, message]);
-    });
-
-    return () => newSocket.disconnect();
-  }, [user]);
+  // Removed WebSocket implementation
 
   const filteredContacts = contacts.filter(contact =>
     contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
