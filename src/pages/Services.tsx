@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +7,7 @@ import { Plus, Search, Edit, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/components/ui/use-toast";
 
 // Dados de exemplo
 const initialServices = [
@@ -26,6 +26,25 @@ interface Service {
   price: number;
 }
 
+// Mock API (simulação)
+const servicesApi = {
+  create: async (service: Omit<Service, 'id'>) => {
+    // Simula um atraso na API
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return { ...service, id: Math.random() }; // Simula um ID gerado pelo servidor
+  },
+  update: async (id: number, service: Service) => {
+    // Simula um atraso na API
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return { ...service, id };
+  },
+  delete: async (id: number) => {
+    // Simula um atraso na API
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return true;
+  }
+};
+
 const Services = () => {
   const [services, setServices] = useState<Service[]>(initialServices);
   const [searchTerm, setSearchTerm] = useState("");
@@ -38,28 +57,62 @@ const Services = () => {
     service.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleAddOrEditService = () => {
-    if (!currentService) return;
+    const loadServices = async () => {
+        // Aqui você faria uma chamada à API para obter os serviços
+        // e atualizar o estado `services`
+        // Exemplo:
+        // const data = await api.getServices();
+        // setServices(data);
+    };
 
-    if (currentService.id) {
-      // Editar serviço existente
-      setServices(services.map(service => 
-        service.id === currentService.id ? currentService : service
-      ));
-    } else {
-      // Adicionar novo serviço
-      const newId = services.length > 0 
-        ? Math.max(...services.map(service => service.id)) + 1 
-        : 1;
-      setServices([...services, { ...currentService, id: newId }]);
+  const handleAddOrEditService = async () => {
+    try {
+      if (!currentService) return;
+
+      if (currentService.id) {
+        //await servicesApi.update(currentService.id, currentService);
+        setServices(services.map(service => 
+          service.id === currentService.id ? currentService : service
+        ));
+        toast("Serviço atualizado", {
+          description: "O serviço foi atualizado com sucesso!"
+        });
+      } else {
+        //await servicesApi.create(currentService);
+          const newId = services.length > 0 
+            ? Math.max(...services.map(service => service.id)) + 1 
+            : 1;
+          setServices([...services, { ...currentService, id: newId }]);
+        toast("Serviço criado", {
+          description: "O serviço foi criado com sucesso!"
+        });
+      }
+
+      //await loadServices();
+      setIsDialogOpen(false);
+      setCurrentService(null);
+    } catch (error) {
+      toast("Erro ao salvar", {
+        description: "Verifique os dados e tente novamente.",
+        variant: "destructive"
+      });
     }
-
-    setIsDialogOpen(false);
-    setCurrentService(null);
   };
 
-  const handleDeleteService = (id: number) => {
-    setServices(services.filter(service => service.id !== id));
+  const handleDeleteService = async (id: number) => {
+    try {
+      //await servicesApi.delete(id);
+      setServices(services.filter(service => service.id !== id));
+      toast("Serviço excluído", {
+        description: "O serviço foi excluído com sucesso!"
+      });
+      //await loadServices();
+    } catch (error) {
+      toast("Erro ao excluir", {
+        description: "Não foi possível excluir o serviço.",
+        variant: "destructive"
+      });
+    }
   };
 
   const openAddDialog = () => {
@@ -80,7 +133,7 @@ const Services = () => {
           <Plus className="mr-2 h-4 w-4" /> Novo Serviço
         </Button>
       </div>
-      
+
       <Card>
         <CardHeader className="pb-3">
           <CardTitle>Lista de Serviços</CardTitle>
