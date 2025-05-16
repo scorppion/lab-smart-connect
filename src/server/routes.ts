@@ -6,11 +6,15 @@ import { AppointmentController } from './controllers/AppointmentController';
 import { MessageController } from './controllers/MessageController';
 
 const router = Router();
+import { requireAuth, requireAdmin } from './middlewares/auth';
 
 const servicesController = new ServicesController();
 const userController = new UserController();
 const appointmentController = new AppointmentController();
 const messageController = new MessageController();
+
+// Middleware global para rotas autenticadas
+router.use('/api', requireAuth);
 
 // Services routes
 router.get('/services', servicesController.list);
@@ -19,10 +23,10 @@ router.put('/services/:id', servicesController.update);
 router.delete('/services/:id', servicesController.delete);
 
 // User routes
-router.get('/users', userController.list);
-router.post('/users', userController.create);
-router.put('/users/:id', userController.update);
-router.delete('/users/:id', userController.delete);
+router.get('/users', requireAdmin, userController.list);
+router.post('/users', requireAdmin, userController.create);
+router.put('/users/:id', requireAdmin, userController.update);
+router.delete('/users/:id', requireAdmin, userController.delete);
 
 // Appointment routes
 router.get('/appointments', appointmentController.list);
