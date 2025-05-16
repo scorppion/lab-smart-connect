@@ -2,23 +2,15 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
-import { Server } from 'socket.io';
 
 const prisma = new PrismaClient();
 
 const messageSchema = z.object({
   content: z.string().min(1),
-  senderId: z.string(),
-  receiverId: z.string()
+  senderId: z.string()
 });
 
 export class MessageController {
-  private io: Server;
-
-  constructor(io: Server) {
-    this.io = io;
-  }
-
   async create(req: Request, res: Response) {
     try {
       const data = messageSchema.parse(req.body);
@@ -26,11 +18,6 @@ export class MessageController {
         data,
         include: { sender: true }
       });
-      
-      // Emitir mensagem para o remetente e destinatário
-      this.io.to(data.senderId).emit('newMessage', message);
-      this.io.to(data.receiverId).emit('newMessage', message);
-      
       return res.status(201).json(message);
     } catch (error) {
       return res.status(400).json({ error });
@@ -38,15 +25,7 @@ export class MessageController {
   }
 
   async list(req: Request, res: Response) {
-    const { userId, contactId } = req.query;
-    
     const messages = await prisma.message.findMany({
-      where: {
-        OR: [
-          { senderId: String(userId), receiverId: String(contactId) },
-          { senderId: String(contactId), receiverId: String(userId) }
-        ]
-      },
       include: { 
         sender: {
           select: {
@@ -56,8 +35,18 @@ export class MessageController {
           }
         }
       },
-      orderBy: { createdAt: 'asc' }
+      orderBy: { createdAt: 'desc' }
     });
     return res.json(messages);
+  }
+
+  async delete(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      await prisma.message.delete({ where: { id } });
+      return res.status(204).send();
+    } catch (error) {
+      return res.status(400).json({ error });
+    }
   }
 }

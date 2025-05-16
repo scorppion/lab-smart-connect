@@ -22,34 +22,11 @@ app.use(errorHandler);
 
 io.on('connection', (socket) => {
   console.log('Client connected');
-
-  socket.on('joinRoom', (userId: string) => {
-    socket.join(userId);
-    console.log(`User ${userId} joined their room`);
-  });
   
-  socket.on('message', async (data) => {
-    const { content, senderId, receiverId } = data;
-    
-    try {
-      const message = await prisma.message.create({
-        data: { content, senderId, receiverId },
-        include: { sender: true }
-      });
-      
-      io.to(senderId).emit('newMessage', message);
-      io.to(receiverId).emit('newMessage', message);
-    } catch (error) {
-      console.error('Error sending message:', error);
-    }
-  });
-
   socket.on('disconnect', () => {
     console.log('Client disconnected');
   });
 });
-
-const messageController = new MessageController(io);
 
 const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, '0.0.0.0', () => {
