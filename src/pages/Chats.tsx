@@ -1,11 +1,12 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Search, Send, Paperclip, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { useUser } from "@clerk/nextjs";
+import io from 'socket.io-client';
 
 // Dados de exemplo
 const initialContacts = [
@@ -50,6 +51,24 @@ const Chats = () => {
   const [selectedContactId, setSelectedContactId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [newMessage, setNewMessage] = useState("");
+  const { user } = useUser();
+
+  const [socket, setSocket] = useState<any>(null);
+
+  useEffect(() => {
+    const newSocket = io('http://0.0.0.0:5000');
+    setSocket(newSocket);
+
+    if (user?.id) {
+      newSocket.emit('joinRoom', user.id);
+    }
+
+    newSocket.on('newMessage', (message: Message) => {
+      setMessages(prev => [...prev, message]);
+    });
+
+    return () => newSocket.disconnect();
+  }, [user]);
 
   const filteredContacts = contacts.filter(contact =>
     contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -57,46 +76,28 @@ const Chats = () => {
   );
 
   const selectedContact = contacts.find(contact => contact.id === selectedContactId);
-  
+
   const contactMessages = messages.filter(
     message => message.contactId === selectedContactId
   );
 
   const handleSendMessage = () => {
-    if (newMessage.trim() === "" || !selectedContactId) return;
+    if (newMessage.trim() === "" || !selectedContactId || !user?.id) return;
 
-    const newId = messages.length > 0 ? Math.max(...messages.map(m => m.id)) + 1 : 1;
-    
-    const time = format(new Date(), "HH:mm");
-    
-    const message: Message = {
-      id: newId,
-      contactId: selectedContactId,
-      text: newMessage,
-      incoming: false,
-      time
+    const messageData = {
+      content: newMessage,
+      senderId: user.id,
+      receiverId: String(selectedContactId)
     };
-    
-    setMessages([...messages, message]);
-    
-    // Atualizar último contato com a última mensagem
-    setContacts(contacts.map(contact => {
-      if (contact.id === selectedContactId) {
-        return {
-          ...contact,
-          lastMessage: newMessage,
-          time
-        };
-      }
-      return contact;
-    }));
-    
+
+    socket.emit('message', messageData);
+
     setNewMessage("");
   };
-  
+
   const selectContact = (contactId: number) => {
     setSelectedContactId(contactId);
-    
+
     // Marcar mensagens como lidas
     setContacts(contacts.map(contact => {
       if (contact.id === contactId) {
@@ -126,7 +127,7 @@ const Chats = () => {
               />
             </div>
           </div>
-          
+
           <div className="flex-1 overflow-y-auto">
             {filteredContacts.length > 0 ? (
               filteredContacts.map((contact) => (
@@ -146,7 +147,7 @@ const Chats = () => {
                       <div className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 bg-success rounded-full border-2 border-background"></div>
                     )}
                   </div>
-                  
+
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-baseline">
                       <p className="font-medium truncate">{contact.name}</p>
@@ -190,7 +191,7 @@ const Chats = () => {
                   <p className="text-xs text-muted-foreground">{selectedContact.phone}</p>
                 </div>
               </div>
-              
+
               <div className="flex-1 overflow-y-auto p-4">
                 {contactMessages.map((message) => (
                   <div
@@ -205,7 +206,7 @@ const Chats = () => {
                   </div>
                 ))}
               </div>
-              
+
               <div className="p-3 border-t">
                 <div className="flex items-center gap-2">
                   <Button variant="ghost" size="icon">
